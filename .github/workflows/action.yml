@@ -30,7 +30,7 @@ jobs:
               console.log('sync issue title is valid');
               core.setFailed('Issue title should contains `:`');
             }
-            github.issues.createComment({
+            github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -67,13 +67,13 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const logUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
-            github.issues.createComment({
+            github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: 'Failed to copy images, please check the [log](' + logUrl + ') for more details.
             });
-            github.issues.update({
+            github.rest.issues.update({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -93,13 +93,13 @@ jobs:
             const mirrorAddr = `${{ vars.ALIYUN_DOCKER_ADDRESS }}/${{ vars.MIRROR_NAMESPACE }}/${{ github.event.issue.title }}`
             const cmdDockerPull = `docker pull ${mirrorAddr}`
             const cmdDockerTag = `docker tag ${mirrorAddr} ${{ github.event.issue.title }}`
-            github.issues.createComment({
+            github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: ' Image has been copied, you can pull it by running the following commands:\n\n```shell\n' + cmdDockerPull + '\n' + cmdDockerTag + '\n``` '
             });
-            github.issues.update({
+            github.rest.issues.update({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
