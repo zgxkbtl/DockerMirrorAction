@@ -10,7 +10,7 @@ copy docker mirror to aluyun registry
 直接将镜像名称写在 Issue 的标题中即可。同步完成后，会在 Issue 中回复。
 
 
-也可以 Fork 本项目，在 [setting](https://github.com/zgxkbtl/DockerMirrorAction/settings/secrets/actions) 添加 `.github/workflows/main.yml` 文件中的变量，自行同步镜像。
+也可以 Fork 本项目，在 [setting](https://docs.github.com/en/actions/learn-github-actions/variables#creating-configuration-variables-for-a-repository) 添加 `.github/workflows/main.yml` 文件中的变量，自行同步镜像。
 具体来说，需要修改以下几个变量：
 - Repository secrets
     - `DOCKER_REGISTRY_PASSWORD`：阿里云镜像仓库的密码
