@@ -30,6 +30,12 @@ jobs:
               console.log('sync issue title is valid');
               core.setFailed('Issue title should contains `:`');
             }
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'Issue title is valid, start to copy image.'
+            });
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -72,7 +78,6 @@ jobs:
               repo: context.repo.repo,
               state: 'closed'
             });
-
 
   handle-success:
     runs-on: ubuntu-latest
