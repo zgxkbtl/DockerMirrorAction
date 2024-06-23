@@ -19,6 +19,10 @@ copy docker mirror to aluyun registry
     - `ALIYUN_REGISTRY_USERNAME`：阿里云镜像仓库命名空间，例如 `zgxkbtl`
     - `MIRROR_NAMESPACE`：同步到阿里云镜像仓库的命名空间，例如 `mirrors`
 
+在此之前，你需要先获取阿里云镜像仓库的密码，并且在其中建立至少一个 namespace。
+登录[控制台](https://cr.console.aliyun.com/cn-zhangjiakou/instances)，开通创建个人实例。
+
+
 ## 如何工作
 
 本项目使用 Github Actions 来同步 Docker 镜像。当有新的 Issue 提出时，会触发 Github Actions，将镜像同步到阿里云镜像仓库。
