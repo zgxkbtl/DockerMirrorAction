@@ -20,6 +20,17 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      - name: Check Issue Title And Post Comment
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const title = context.payload.issue.title;
+            if (!title.includes(':')) {
+              console.log('sync issue title is valid');
+              core.setFailed('Issue title should contains `:`');
+            }
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       
@@ -38,3 +49,55 @@ jobs:
           docker buildx imagetools create \
             --tag ${{ vars.ALIYUN_DOCKER_ADDRESS }}/${{ vars.MIRROR_NAMESPACE }}/${{ github.event.issue.title }} \
             ${{ github.event.issue.title }}          
+
+  handle-failed:
+    runs-on: ubuntu-latest
+    if: failure()
+    steps:
+      - name: Replay and close issue
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const logUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'Failed to copy images, please check the [log](' + logUrl + ') for more details.
+            });
+            github.issues.update({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'closed'
+            });
+
+
+  handle-success:
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+      - name: Replay and close issue
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const mirrorAddr = `${{ vars.ALIYUN_DOCKER_ADDRESS }}/${{ vars.MIRROR_NAMESPACE }}/${{ github.event.issue.title }}`
+            const cmdDockerPull = `docker pull ${mirrorAddr}`
+            const cmdDockerTag = `docker tag ${mirrorAddr} ${{ github.event.issue.title }}`
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: |
+                Image has been copied, you can pull it by running the following commands:
+                  
+                  ```shell\n' + cmdDockerPull + '\n' + cmdDockerTag + '\n```
+            });
+            github.issues.update({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'closed'
+            });
