@@ -57,6 +57,7 @@ jobs:
             ${{ github.event.issue.title }}          
 
   handle-failed:
+    needs: build
     runs-on: ubuntu-latest
     if: failure()
     steps:
@@ -80,6 +81,7 @@ jobs:
             });
 
   handle-success:
+    needs: build
     runs-on: ubuntu-latest
     if: success()
     steps:
