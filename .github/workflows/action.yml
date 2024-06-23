@@ -34,6 +34,9 @@ jobs:
               console.log('sync issue title is valid');
               core.setFailed('Issue title should contains `:`');
             }
+            // replace / to - in title and set to vars
+            const newTitle = title.replace(/\//g, '-');
+            core.exportVariable('NEW_TITLE', newTitle);
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
@@ -57,7 +60,7 @@ jobs:
       - name: Push image to Aliyun
         run: |
           docker buildx imagetools create \
-            --tag ${{ vars.ALIYUN_DOCKER_ADDRESS }}/${{ vars.MIRROR_NAMESPACE }}/${{ github.event.issue.title }} \
+            --tag ${{ vars.ALIYUN_DOCKER_ADDRESS }}/${{ vars.MIRROR_NAMESPACE }}/${{ vars.NEW_TITLE }} \
             ${{ github.event.issue.title }}          
 
   handle-failed:
