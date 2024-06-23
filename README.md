@@ -25,4 +25,4 @@ copy docker mirror to aluyun registry
 由于每月 Github Actions 有免费的 2000 分钟，可以 Fork 本项目，自行同步镜像。
 
 阿里云的个人镜像仓库有免费的 300 个镜像仓库，可以用来同步镜像。如果需要更多的镜像仓库，可以购买企业镜像仓库。
-也可以使用其他的镜像仓库，只需要修改 `.github/workflows/main.yml` 文件中的 `DOCKER_REGISTRY_ADDRESS` 变量即可。
+也可以使用其他的镜像仓库，只需要修改对应的变量即可。
