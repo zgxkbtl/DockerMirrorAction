@@ -41,7 +41,7 @@ jobs:
               repo: context.repo.repo,
               body: 'Issue title is valid, start to copy image.'
             });
-            const newTitle = context.issue.title.replace(/\//g, '-');
+            const newTitle = ${{ github.event.issue.title }}.replace(/\//g, '-');
             return newTitle;
       
       - name: Set up QEMU
@@ -97,7 +97,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const newTitle = context.issue.title.replace(/\//g, '-');
+            const newTitle = ${{ github.event.issue.title }}.replace(/\//g, '-');
             const mirrorAddr = `${{ vars.ALIYUN_DOCKER_ADDRESS }}/${{ vars.MIRROR_NAMESPACE }}/${newTitle}`
             const cmdDockerPull = `docker pull ${mirrorAddr}`
             const cmdDockerTag = `docker tag ${mirrorAddr} ${{ github.event.issue.title }}`
