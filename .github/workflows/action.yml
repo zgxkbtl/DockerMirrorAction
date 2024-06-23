@@ -25,6 +25,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - name: Check Issue Title And Post Comment
+        id: checktitle
         uses: actions/github-script@v5
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -34,16 +35,15 @@ jobs:
               console.log('sync issue title is valid');
               core.setFailed('Issue title should contains `:`');
             }
-            // replace / to - in title and set to vars
-            const newTitle = title.replace(/\//g, '-');
-            core.exportVariable('NEW_TITLE', newTitle);
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: 'Issue title is valid, start to copy image.'
             });
-
+            const newTitle = context.issue.title.replace(/\//g, '-');
+            return newTitle;
+      
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       
@@ -60,7 +60,7 @@ jobs:
       - name: Push image to Aliyun
         run: |
           docker buildx imagetools create \
-            --tag ${{ vars.ALIYUN_DOCKER_ADDRESS }}/${{ vars.MIRROR_NAMESPACE }}/${{ vars.NEW_TITLE }} \
+            --tag ${{ vars.ALIYUN_DOCKER_ADDRESS }}/${{ vars.MIRROR_NAMESPACE }}/${{ steps.checktitle.outputs.result }} \
             ${{ github.event.issue.title }}          
 
   handle-failed:
@@ -97,7 +97,8 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const mirrorAddr = `${{ vars.ALIYUN_DOCKER_ADDRESS }}/${{ vars.MIRROR_NAMESPACE }}/${{ github.event.issue.title }}`
+            const newTitle = context.issue.title.replace(/\//g, '-');
+            const mirrorAddr = `${{ vars.ALIYUN_DOCKER_ADDRESS }}/${{ vars.MIRROR_NAMESPACE }}/${newTitle}`
             const cmdDockerPull = `docker pull ${mirrorAddr}`
             const cmdDockerTag = `docker tag ${mirrorAddr} ${{ github.event.issue.title }}`
             github.rest.issues.createComment({
